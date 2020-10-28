@@ -26,12 +26,19 @@ def main():
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             filename = filename.strip('.csv')
+            print(f'{filename}.csv:')
             dataCollector.read_data(filename, 'csv')
+
+            print(f'\tColunas Removidas: {dataCollector.dropped_columns.get(filename)}')
+            print(f'\tColunas Restantes: {dataCollector.remaining_columns.get(filename)}')
+
             dataCollector.convert_to_numpy(filename)
             dataCollector.train_tests(filename)
-            dataCollector.plot_pred(filename)
-        else:
-            continue
+            dataCollector.plot_prediction(filename)
+            dataCollector.print_formula(filename, keep_tab=True)
+            dataCollector.print_r2(filename, keep_tab=True)
+
+            print()
 
 
 if __name__ == "__main__":
