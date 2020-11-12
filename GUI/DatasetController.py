@@ -3,11 +3,9 @@ from DatasetHandler import Dataset
 
 
 class DatasetController:
-
     def __init__(self):
+        self.datasets = {}
         self.currDataset = Dataset("datasets/whr_2015.csv")
-
-
 
     def getAvailableDatasets(self):
         files = os.listdir(os.curdir+"/datasets")
@@ -20,7 +18,12 @@ class DatasetController:
         return csvList
 
     def setDataset(self, path):
-        self.currDataset = Dataset("datasets/"+path)
+        filepath = f"datasets/{path}"
+
+        if path not in self.datasets.keys():
+            self.datasets[path] = Dataset(filepath)
+
+        self.currDataset = self.datasets.get(path)
 
 
 

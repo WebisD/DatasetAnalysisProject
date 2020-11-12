@@ -12,59 +12,67 @@ except ImportError:
 
 try:
     import ttk
+
     py3 = False
 except ImportError:
     import tkinter.ttk as ttk
+
     py3 = True
 
 import GraphicalApp_support
+
 
 def start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
     GraphicalApp_support.set_Tk_var()
-    top = DatasetView (root)
+    top = DatasetView(root)
     GraphicalApp_support.init(root, top)
     root.mainloop()
 
+
 w = None
+
+
 def create_View(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
     rt = root
-    w = tk.Toplevel (root)
+    w = tk.Toplevel(root)
     GraphicalApp_support.set_Tk_var()
-    top = DatasetView (w)
+    top = DatasetView(w)
     GraphicalApp_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 def destroy_Toplevel1():
     global w
     w.destroy()
     w = None
 
+
 class DatasetView:
     def __init__(self, top=None):
+        self.controller = DatasetController()
 
-        controller = DatasetController()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
         self.style = ttk.Style()
         if sys.platform == "win32":
             self.style.theme_use('winnative')
 
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font="TkDefaultFont")
-        self.style.map('.',background=
-            [('selected', _compcolor), ('active',_ana2color)])
+        self.style.configure('.', background=_bgcolor)
+        self.style.configure('.', foreground=_fgcolor)
+        self.style.configure('.', font="TkDefaultFont")
+        self.style.map('.', background=
+        [('selected', _compcolor), ('active', _ana2color)])
 
         top.geometry("587x450+418+181")
         top.title("New Toplevel")
@@ -84,20 +92,13 @@ class DatasetView:
         self.OverviewBtn.configure(pady="0")
         self.OverviewBtn.configure(text='''Overview Data''')
 
-
-
         self.ComboboxDs = ttk.Combobox(top)
         self.ComboboxDs.place(relx=0.307, rely=0.089, relheight=0.047, relwidth=0.567)
         self.ComboboxDs.configure(state='readonly')
-        self.ComboboxDs.configure(values=controller.getAvailableDatasets())
-
-
-        def handleUpdateCSV(event):
-            controller.setDataset(self.ComboboxDs.get())
+        self.ComboboxDs.configure(values=self.controller.getAvailableDatasets())
 
         self.ComboboxDs.current(0)
-        self.ComboboxDs.bind("<<ComboboxSelected>>", handleUpdateCSV)
-
+        self.ComboboxDs.bind("<<ComboboxSelected>>", self.handleUpdateCSV)
 
         self.DsLabel = tk.Label(top)
         self.DsLabel.place(relx=0.068, rely=0.089, height=21, width=140)
@@ -110,23 +111,6 @@ class DatasetView:
         self.DsLabel.configure(highlightcolor="black")
         self.DsLabel.configure(text='''Select the dataset file:''')
 
-
-
-
-
-        # self.formatColumnsBtn = tk.Button(top)
-        # self.formatColumnsBtn.place(relx=0.596, rely=0.244, height=74, width=147)
-        #
-        # self.formatColumnsBtn.configure(activebackground="#ececec")
-        # self.formatColumnsBtn.configure(activeforeground="#000000")
-        # self.formatColumnsBtn.configure(background="#d9d9d9")
-        # self.formatColumnsBtn.configure(disabledforeground="#a3a3a3")
-        # self.formatColumnsBtn.configure(foreground="#000000")
-        # self.formatColumnsBtn.configure(highlightbackground="#d9d9d9")
-        # self.formatColumnsBtn.configure(highlightcolor="black")
-        # self.formatColumnsBtn.configure(pady="0")
-        # self.formatColumnsBtn.configure(text='''Format columns''')
-
         self.LRButton = tk.Button(top)
         self.LRButton.place(relx=0.068, rely=0.8, height=64, width=117)
         self.LRButton.configure(activebackground="#ececec")
@@ -137,11 +121,11 @@ class DatasetView:
         self.LRButton.configure(highlightbackground="#d9d9d9")
         self.LRButton.configure(highlightcolor="black")
         self.LRButton.configure(pady="0")
-        self.LRButton.configure(text='''Linear Regression''', command = controller.currDataset.linearRegression)
+        self.LRButton.configure(text='''Linear Regression''', command=self.controller.currDataset.linearRegression)
 
         self.VarCorrelationsBtn = tk.Button(top)
         self.VarCorrelationsBtn.place(relx=0.153, rely=0.533, height=74
-                , width=147)
+                                      , width=147)
         self.VarCorrelationsBtn.configure(activebackground="#ececec")
         self.VarCorrelationsBtn.configure(activeforeground="#000000")
         self.VarCorrelationsBtn.configure(background="#d9d9d9")
@@ -188,10 +172,11 @@ class DatasetView:
         self.PredictValueBtn.configure(pady="0")
         self.PredictValueBtn.configure(text='''Predict Value''')
 
+    def handleUpdateCSV(self, event):
+        name = self.ComboboxDs.get()
+        self.controller.setDataset(name)
+        self.LRButton.configure(text='''Linear Regression''', command=self.controller.currDataset.linearRegression)
+
+
 if __name__ == '__main__':
     start_gui()
-
-
-
-
-
